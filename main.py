@@ -114,7 +114,7 @@ class MNTR:
         return self._numeric_const_pattern.findall(line_)
 
     @classmethod
-    def discover_mntr_files(cls, path):
+    def discover_mntr_files(cls, path, filter=None):
         """
         it looks for mntr files in path
         """
@@ -124,6 +124,8 @@ class MNTR:
             dirname = path
         _ret = os.listdir(dirname)
         _ret = [os.path.join(dirname, x) for x in _ret if x.lower().endswith('.mntr')]
+        if filter is not None:
+            _ret = [x for x in _ret if filter in x]
         _ret = sorted(_ret, key=lambda x: time.ctime(os.path.getmtime(x)))
         return _ret
 
@@ -132,18 +134,22 @@ class MNTR:
         data = self.data
         _x = data[horizontal]
         for dataline in vertical:
-            if dataline:
-                _y = data[dataline]
-                plt.plot(data[horizontal], data[dataline], 'bD--', markersize=5)
+            _y = data[dataline]
+            if _y:
+                plt.plot(data[horizontal], _y, 'bD--', markersize=5)
                 plt.title(self.jobname + '.\nmax: {:.4f}, time: {}'.format(max(_y), self.datetime[0]))
                 plt.xlabel(horizontal)
                 plt.ylabel(dataline)
-        else:
-            print('No data yet for {}'.format(self.jobname))
+            else:
+                print('No data yet for {}'.format(self.jobname))
         plt.show()
 
 
 if __name__ == '__main__':
-    files = MNTR.discover_mntr_files(os.path.abspath('D:\\ANSYS\\20.167.90 - Delle\\'))
-    monitor = MNTR(files[-1])
-    monitor.plot()
+    files = MNTR.discover_mntr_files(os.path.abspath('D:\\ANSYS\\20.167.90 - Delle\\'), filter='MNA')
+    # monitor = MNTR(files[-1])
+    # monitor.plot()
+    for file in files:
+        monitor = MNTR(file)
+        print(monitor.jobname, max(monitor.data['time']))
+        monitor.plot()
