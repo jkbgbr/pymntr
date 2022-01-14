@@ -146,10 +146,10 @@ class MNTR:
 
 
 if __name__ == '__main__':
-    files = MNTR.discover_mntr_files(os.path.abspath('D:\\ANSYS\\20.167.90 - Delle\\'), filter='MNA')
+    files = MNTR.discover_mntr_files(os.path.abspath('D:\\ANSYS\\20.167.90 - Delle\\'), filter='x0_')
     # monitor = MNTR(files[-1])
     # monitor.plot()
     for file in files:
         monitor = MNTR(file)
-        print(monitor.jobname, max(monitor.data['time']))
+        print(monitor.jobname, '{:.4f}'.format(max(monitor.data['time'])))
         monitor.plot()
